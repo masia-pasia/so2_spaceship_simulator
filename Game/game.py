@@ -22,7 +22,7 @@ class SpaceShipGame:
             self.handle_input()
             self._process_game_logic()
             self._draw()
-            print(self.spaceship.velocity)
+            print("Prędkość: " + self.spaceship.velocity.__str__() + "Kierunek: " + self.spaceship.direction.__str__())
 
     def handle_input(self):
         for event in pygame.event.get():
@@ -39,8 +39,8 @@ class SpaceShipGame:
             self.spaceship.accelerate()
         elif is_key_pressed[pygame.K_DOWN]:
             self.spaceship.brake()
-        else:
-            self.spaceship.slow()
+        # else:
+        #     self.spaceship.slow()
         if is_key_pressed[pygame.K_LCTRL]:
             self.spaceship.stop()
 

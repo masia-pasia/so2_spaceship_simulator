@@ -41,10 +41,13 @@ class Spaceship(GameObject):
         if 10 > self.velocity.x > -10 and 10 > self.velocity.y > -10:
             self.velocity += self.direction * self.ACCELERATION
         else:
-            self.velocity = self.direction
+            self.velocity = self.direction.copy()
 
     def brake(self):
-        self.velocity -= self.velocity * self.BRAKE
+        if not 0.1 > self.velocity.x > -0.1 or not 0.1 > self.velocity.y > -0.1:
+            self.velocity -= self.velocity * self.BRAKE
+        else:
+            self.velocity = Vector2(0)
 
     def stop(self):
         self.velocity = Vector2(0)
@@ -62,7 +65,7 @@ class Spaceship(GameObject):
         surface.blit(rotated_surface, blit_position)
 
     def slow(self):
-        if not 0.5 > self.velocity.y > -0.5 or not 0.5 > self.velocity.x > -0.5:
+        if not 0.9 > self.velocity.y > -0.9 and not 0.9 > self.velocity.x > -0.9:
             self.velocity -= self.velocity * self.RESISTANCE
         else:
             self.velocity = Vector2(0)
