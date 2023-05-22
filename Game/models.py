@@ -29,22 +29,22 @@ class GameObject:
 
 class Spaceship(GameObject):
     MANEUVERABILITY = 3
-    ACCELERATION = 0.2
-    BRAKE = 0.1
-    RESISTANCE = 0.05
+    ACCELERATION = 0.3
+    BRAKE = 0.25
+    RESISTANCE = 0.1
+    MAX_SPEED = 10
 
     def __init__(self, position):
         self.direction = Vector2(UP)
         super().__init__(position, load_sprite("ufo1_small.png"), Vector2(0))
 
     def accelerate(self):
-        if 10 > self.velocity.x > -10 and 10 > self.velocity.y > -10:
+        if 10 > (self.velocity + self.direction * self.ACCELERATION).length():
             self.velocity += self.direction * self.ACCELERATION
-        else:
-            self.velocity = self.direction
 
     def brake(self):
-        self.velocity -= self.velocity * self.BRAKE
+        if 10 > (self.velocity - self.direction * self.ACCELERATION).length():
+            self.velocity -= self.direction * self.BRAKE
 
     def stop(self):
         self.velocity = Vector2(0)
@@ -62,7 +62,7 @@ class Spaceship(GameObject):
         surface.blit(rotated_surface, blit_position)
 
     def slow(self):
-        if not 0.5 > self.velocity.y > -0.5 or not 0.5 > self.velocity.x > -0.5:
+        if self.MAX_SPEED >= self.velocity.length() > 0.01:
             self.velocity -= self.velocity * self.RESISTANCE
         else:
             self.velocity = Vector2(0)

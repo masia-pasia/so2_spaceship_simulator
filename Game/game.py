@@ -22,7 +22,6 @@ class SpaceShipGame:
             self.handle_input()
             self._process_game_logic()
             self._draw()
-            print(self.spaceship.velocity)
 
     def handle_input(self):
         for event in pygame.event.get():
