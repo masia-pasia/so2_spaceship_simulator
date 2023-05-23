@@ -20,7 +20,16 @@ class GameObject:
         surface.blit(self.sprite, blit_position)
 
     def move(self, surface):
-        self.position = wrap_position(self.position + self.velocity, surface)
+        w, h = surface.get_size()
+        # if not (0 < self.position.x < w and 0 < self.position.y < h):
+        #     self.velocity = Vector2(0)
+        # else:
+        #     self.position = self.position + self.velocity
+
+        if 0 < self.position.x + self.velocity.x < w and 0 < self.position.y + self.velocity.y < h:
+            self.position = self.position + self.velocity
+        else:
+            self.velocity = Vector2(0)
 
     def collides_with(self, other_obj):
         distance = self.position.distance_to(other_obj.position)
@@ -31,7 +40,7 @@ class Spaceship(GameObject):
     MANEUVERABILITY = 3
     ACCELERATION = 0.3
     BRAKE = 0.25
-    RESISTANCE = 0.1
+    RESISTANCE = 0.01
     MAX_SPEED = 10
 
     def __init__(self, position):
