@@ -1,5 +1,5 @@
 from pygame.math import Vector2
-from utils import load_sprite, wrap_position
+from utils import load_sprite, get_random_velocity, load_sound
 from pygame.transform import rotozoom
 
 UP = Vector2(0, -1)
@@ -21,11 +21,6 @@ class GameObject:
 
     def move(self, surface):
         w, h = surface.get_size()
-        # if not (0 < self.position.x < w and 0 < self.position.y < h):
-        #     self.velocity = Vector2(0)
-        # else:
-        #     self.position = self.position + self.velocity
-
         if 0 < self.position.x + self.velocity.x < w and 0 < self.position.y + self.velocity.y < h:
             self.position = self.position + self.velocity
         else:
@@ -40,11 +35,14 @@ class Spaceship(GameObject):
     MANEUVERABILITY = 3
     ACCELERATION = 0.3
     BRAKE = 0.25
-    RESISTANCE = 0.01
+    RESISTANCE = 0.05
     MAX_SPEED = 10
+    BULLET_SPEED = 3
 
-    def __init__(self, position):
+    def __init__(self, position, create_bullet_callback):
         self.direction = Vector2(UP)
+        self.create_bullet_callback = create_bullet_callback
+        self.laser_sound = load_sound("laser.mp3")
         super().__init__(position, load_sprite("ufo1_small.png"), Vector2(0))
 
     def accelerate(self):
@@ -76,7 +74,36 @@ class Spaceship(GameObject):
         else:
             self.velocity = Vector2(0)
 
+    def shoot(self):
+        bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
+        bullet = Bullet(self.position, bullet_velocity)
+        self.create_bullet_callback(bullet)
+        self.laser_sound.play()
+
 
 class Asteroid(GameObject):
     def __init__(self, position):
-        super().__init__(position, load_sprite("meteor1_smaller.png"), (0, 0))
+        super().__init__(position, load_sprite("asteroid_smaller.png"), get_random_velocity(1, 3))
+
+    def move(self, surface):
+        w, h = surface.get_size()
+        if self.position.x > w or self.position.x < 0:
+            self.velocity.x = -self.velocity.x
+        if self.position.y > h or self.position.y < 0:
+            self.velocity.y = -self.velocity.y
+        self.position += self.velocity
+
+
+class Bullet(GameObject):
+    def __init__(self, position, velocity):
+        super().__init__(position, load_sprite("bullet_smaller.png"), velocity)
+
+    def draw(self, surface):
+        angle = self.velocity.angle_to(UP)
+        rotated_surface = rotozoom(self.sprite, angle, 1.0)
+        rotated_surface_size = Vector2(rotated_surface.get_size())
+        blit_position = self.position - rotated_surface_size * 0.5
+        surface.blit(rotated_surface, blit_position)
+
+    def move(self, surface):
+        self.position += self.velocity
