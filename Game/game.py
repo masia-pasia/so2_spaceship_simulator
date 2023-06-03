@@ -1,6 +1,7 @@
 import pygame
 from utils import load_sprite, get_random_position
 from models import Spaceship, Asteroid
+import pygame_menu
 
 
 def _init_pygame():
@@ -8,12 +9,22 @@ def _init_pygame():
     pygame.display.set_caption("Spaceship game")
 
 
+def _menu():
+    _init_pygame()
+    surface = pygame.display.set_mode((1000, 667))
+    space_ship_game = SpaceShipGame(surface)
+    menu = pygame_menu.Menu('Welcome', 1000, 667, theme=pygame_menu.themes.THEME_BLUE)
+    menu.add.button('Play', space_ship_game.main_loop)
+    menu.add.button('Quit', quit)
+    menu.mainloop(surface)
+
+
 class SpaceShipGame:
     MIN_ASTEROID_DISTANCE = 250
 
-    def __init__(self):
-        _init_pygame()
-        self.screen = pygame.display.set_mode((1000, 667))
+    def __init__(self, surface):
+        # _init_pygame()
+        self.screen = surface
         self.background = load_sprite("space.jpg", False)
         self.clock = pygame.time.Clock()
         self.bullets = []
@@ -39,9 +50,9 @@ class SpaceShipGame:
             if event.type == pygame.QUIT:
                 quit()
             elif (
-                self.spaceship
-                and event.type == pygame.KEYDOWN
-                and event.key == pygame.K_SPACE
+                    self.spaceship
+                    and event.type == pygame.KEYDOWN
+                    and event.key == pygame.K_SPACE
             ):
                 self.spaceship.shoot()
 
@@ -81,7 +92,6 @@ class SpaceShipGame:
         for bullet in self.bullets[:]:
             if not self.screen.get_rect().collidepoint(bullet.position):
                 self.bullets.remove(bullet)
-
 
     def _draw(self):
         self.screen.blit(self.background, (0, 0))
