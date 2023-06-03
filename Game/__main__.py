@@ -1,5 +1,7 @@
-from game import SpaceShipGame
+from game import _menu
+
+import pygame
 
 if __name__ == '__main__':
-    space_ship_game = SpaceShipGame()
-    space_ship_game.main_loop()
+    _menu()
+
