@@ -1,4 +1,9 @@
 import pygame
+import threading
+
+from pygame import Vector2
+from pygame_menu import Theme
+import time
 from utils import load_sprite, get_random_position
 from models import Spaceship, Asteroid, Beer
 import pygame_menu
@@ -17,9 +22,18 @@ def _menu():
     _init_pygame()
     surface = pygame.display.set_mode((1000, 667))
     space_ship_game = SpaceShipGame(surface)
-    menu = pygame_menu.Menu('Welcome', 1000, 667, theme=pygame_menu.themes.THEME_BLUE)
-    menu.add.button('Play', space_ship_game.main_loop)
-    menu.add.button('Quit', quit)
+    welcome_text = "Dear student! The greatest threat appeared, there are no more beer \n and the party is about to colapse.\n" \
+                   " You need to set out on a mission to rescue your fellow colleagues \n - collect 10 beers and come back on earth\n" \
+                   "as soon as you can!"
+    mytheme = pygame_menu.themes.THEME_DARK.copy()
+    font = pygame_menu.font.FONT_MUNRO
+    mytheme.widget_font = font
+    mytheme.title_font = font
+    mytheme.title_font_size = 50
+    menu = pygame_menu.Menu('PIWO MOJE PALIWO', 1000, 667, theme=mytheme)
+    menu.add.label(welcome_text)
+    menu.add.button('Play', space_ship_game.main_loop, font_size=40, padding=20)
+    menu.add.button('Quit', quit, font_size=40, padding=20)
     menu.mainloop(surface)
 
 
@@ -46,9 +60,13 @@ class SpaceShipGame:
 
     def main_loop(self):
         while True:
-            self.handle_input()
-            self._process_game_logic()
-            self._draw()
+            if self.spaceship:
+                self.handle_input()
+                self._process_game_logic()
+                self._draw()
+            else:
+                self._loss_message()
+
 
     def handle_input(self):
         for event in pygame.event.get():
@@ -134,3 +152,16 @@ class SpaceShipGame:
             game_objects.append(self.spaceship)
 
         return game_objects
+
+    def _loss_message(self):
+        for asteroid in self.asteroids:
+            asteroid.velocity = Vector2(0)
+        # self.screen.blit("You lost")
+        myfont = pygame.font.SysFont("munro", 30)
+
+        # render text
+        label = myfont.render("You lost!", 1, (255, 255, 0))
+        self.screen.blit(label, (500, 333))
+        pygame.display.update()
+        time.sleep(5)
+        quit()
