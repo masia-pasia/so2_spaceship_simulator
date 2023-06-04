@@ -5,7 +5,9 @@ import pygame_menu
 
 
 def _init_pygame():
+    # pygame init is responsible for loading all necessary modules
     pygame.init()
+    # window name
     pygame.display.set_caption("Spaceship game")
 
 
@@ -23,7 +25,6 @@ class SpaceShipGame:
     MIN_ASTEROID_DISTANCE = 250
 
     def __init__(self, surface):
-        # _init_pygame()
         self.screen = surface
         self.background = load_sprite("space.jpg", False)
         self.clock = pygame.time.Clock()
@@ -79,6 +80,7 @@ class SpaceShipGame:
         if self.spaceship:
             for asteroid in self.asteroids:
                 if asteroid.collides_with(self.spaceship):
+                    # fajnie by bylo dodac jakis wybuch po zderzeniu
                     self.spaceship = None
                     break
 
@@ -94,9 +96,11 @@ class SpaceShipGame:
                 self.bullets.remove(bullet)
 
     def _draw(self):
+        # draw one image onto another
         self.screen.blit(self.background, (0, 0))
         for game_object in self._get_game_objects():
             game_object.draw(self.screen)
+        # updating display
         pygame.display.flip()
         self.clock.tick(60)
 
