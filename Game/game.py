@@ -58,9 +58,9 @@ class SpaceShipGame:
         self.time = time.time()
         self.key_lock = threading.Lock()
         self.condition = threading.Condition()
-
         self.thread1 = threading.Thread(target=self.spaceship.use_fuel, args=(self.spaceship,), daemon=True)
-        self.thread2 = threading.Thread(target=self.spaceship.add_fuel, args=(self.key_lock, self.beer, self.spaceship, self.condition),
+        self.thread2 = threading.Thread(target=self.spaceship.add_fuel, args=(self.spaceship, self.condition,
+                                                                              self.key_lock),
                                         daemon=True)
         # self.thread3 = threading.Thread(target=self._place_beer, daemon=True)
         # self.thread4 = threading.Thread(target=self._destroy_beer, daemon=True)
@@ -78,7 +78,6 @@ class SpaceShipGame:
         self.thread2.start()
         # self.thread3.start()
         # self.thread4.start()
-
 
     def proba(self):
         self.main_loop()
@@ -143,12 +142,13 @@ class SpaceShipGame:
                         self.beer.remove(beer)
                         self.asteroids.remove(asteroid)
                     if self.spaceship.collides_with(beer):
-                        self.condition.notify()
-                        self.condition.wait()
-                        self.beer.remove(beer)
+                        # self.spaceship.key_lock.acquire()
+                        with self.condition:
+                            self.condition.notify()
+                            self.beer.remove(beer)
+                        # self.spaceship.key_lock.release()
 
                 self.key_lock.release()
-
 
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
@@ -158,7 +158,6 @@ class SpaceShipGame:
                     break
             if not self.screen.get_rect().collidepoint(bullet.position):
                 self.bullets.remove(bullet)
-
 
         # for bullet in self.bullets[:]:
         #     if not self.screen.get_rect().collidepoint(bullet.position):
@@ -187,13 +186,13 @@ class SpaceShipGame:
     def _draw(self):
         # draw one image onto another
         self.screen.blit(self.background, (0, 0))
-        #self.key_lock.acquire()
+        # self.key_lock.acquire()
         for game_object in self._get_game_objects():
             game_object.draw(self.screen)
 
         for beer in self.beer:
             beer.draw(self.screen)
-        #self.key_lock.release()
+        # self.key_lock.release()
         # updating display
         pygame.display.flip()
         self.clock.tick(60)
