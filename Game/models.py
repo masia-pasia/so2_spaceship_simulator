@@ -1,7 +1,10 @@
+import time
+
 from pygame.math import Vector2
 from utils import load_sprite, get_random_velocity, load_sound
 from pygame.transform import rotozoom
 import threading
+
 UP = Vector2(0, -1)
 DOWN = Vector2(0, 1)
 
@@ -84,22 +87,41 @@ class Spaceship(GameObject):
         self.create_bullet_callback(bullet)
         self.laser_sound.play()
 
-    def use_fuel(self):
-        self.key_lock.acquire()
-        if self.fuel - 0.001 * self.FUEL_CAPACITY > 0:
-            self.fuel -= 0.001 * self.FUEL_CAPACITY
-        else:
-            self.fuel = 0
-        self.key_lock.release()
-        print(self.fuel)
+    def use_fuel(self, spaceship):
+        while spaceship:
+            self.key_lock.acquire()
+            if self.fuel - 0.001 * self.FUEL_CAPACITY > 0:
+                self.fuel -= 0.001 * self.FUEL_CAPACITY
+            else:
+                self.fuel = 0
+            self.key_lock.release()
+            print(self.fuel)
+            time.sleep(10)
 
-    def add_fuel(self):
-        self.key_lock.acquire()
-        if self.fuel + 0.2 * self.FUEL_CAPACITY > self.FUEL_CAPACITY:
-            self.fuel = self.FUEL_CAPACITY
-        else:
-            self.fuel += 0.2 * self.FUEL_CAPACITY
-        self.key_lock.release()
+    def add_fuel(self, beer_key_lock, beer_table, spaceship, condition):
+        while True:
+            condition.wait()
+            self.key_lock.acquire()
+            if self.fuel + 0.2 * self.FUEL_CAPACITY > self.FUEL_CAPACITY:
+                self.fuel = self.FUEL_CAPACITY
+            else:
+                self.fuel += 0.2 * self.FUEL_CAPACITY
+            self.key_lock.release()
+            condition.notify()
+
+
+# while spaceship:
+#     beer_key_lock.acquire()
+#     for beer in beer_table[:]:
+#         if spaceship.collides_with(beer):
+#             self.key_lock.acquire()
+#             if self.fuel + 0.2 * self.FUEL_CAPACITY > self.FUEL_CAPACITY:
+#                 self.fuel = self.FUEL_CAPACITY
+#             else:
+#                 self.fuel += 0.2 * self.FUEL_CAPACITY
+#             self.key_lock.release()
+#             beer_table.remove(beer)
+#     beer_key_lock.release()
 
 
 class Asteroid(GameObject):
@@ -135,4 +157,3 @@ class Bullet(GameObject):
 class Beer(GameObject):
     def __init__(self, position):
         super().__init__(position, load_sprite("piwo_ale_takie_male.png"))
-
