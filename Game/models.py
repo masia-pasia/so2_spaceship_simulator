@@ -4,6 +4,7 @@ from pygame.math import Vector2
 from utils import load_sprite, get_random_velocity, load_sound
 from pygame.transform import rotozoom
 import threading
+import game
 
 UP = Vector2(0, -1)
 DOWN = Vector2(0, 1)
@@ -90,12 +91,13 @@ class Spaceship(GameObject):
     def use_fuel(self, spaceship):
         while spaceship:
             spaceship.key_lock.acquire()
-            if self.fuel - 0.001 * self.FUEL_CAPACITY > 0:
-                self.fuel -= 0.001 * self.FUEL_CAPACITY
+            if self.fuel - 0.02 * self.FUEL_CAPACITY > 0:
+                self.fuel -= 0.02 * self.FUEL_CAPACITY
             else:
                 self.fuel = 0
             spaceship.key_lock.release()
             print(self.fuel)
+            #game.SpaceShipGame._fuel_bar(game.SpaceShipGame)
             time.sleep(1)
 
     def add_fuel(self, spaceship, condition, key_lock):
@@ -115,15 +117,15 @@ class Spaceship(GameObject):
 
 # while spaceship:
 #     beer_key_lock.acquire()
-#     for beer in beer_table[:]:
-#         if spaceship.collides_with(beer):
+#     for fuel in beer_table[:]:
+#         if spaceship.collides_with(fuel):
 #             self.key_lock.acquire()
 #             if self.fuel + 0.2 * self.FUEL_CAPACITY > self.FUEL_CAPACITY:
 #                 self.fuel = self.FUEL_CAPACITY
 #             else:
 #                 self.fuel += 0.2 * self.FUEL_CAPACITY
 #             self.key_lock.release()
-#             beer_table.remove(beer)
+#             beer_table.remove(fuel)
 #     beer_key_lock.release()
 
 
@@ -155,6 +157,11 @@ class Bullet(GameObject):
 
     def move(self, surface):
         self.position += self.velocity
+
+
+class Fuel(GameObject):
+    def __init__(self, position):
+        super().__init__(position, load_sprite("gas.png"))
 
 
 class Beer(GameObject):

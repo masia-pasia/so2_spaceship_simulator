@@ -5,7 +5,7 @@ from pygame.mixer import Sound
 
 
 def load_sprite(name, with_alpha=True):
-    path = f"C:/Users/filip/PycharmProjects/so2_spaceship_simulator/assets/sprites/{name}"
+    path = f"C:/Users/maria/PycharmProjects/so2_spaceship_simulator/assets/sprites/{name}"
     loaded_sprite = load(path)
 
     if with_alpha:
@@ -15,7 +15,7 @@ def load_sprite(name, with_alpha=True):
 
 
 def load_sound(name):
-    path = f"C:/Users/filip/PycharmProjects/so2_spaceship_simulator/assets/sounds/{name}"
+    path = f"C:/Users/maria/PycharmProjects/so2_spaceship_simulator/assets/sounds/{name}"
     return Sound(path)
 
 
