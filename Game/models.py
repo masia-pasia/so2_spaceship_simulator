@@ -33,7 +33,7 @@ class Spaceship(GameObject):
     BRAKE = 0.25
     RESISTANCE = 0.05
     MAX_SPEED = 10
-    BULLET_SPEED = 3
+    BULLET_SPEED = 6
     FUEL_CAPACITY = 10
 
     def __init__(self, position, create_bullet_callback):
