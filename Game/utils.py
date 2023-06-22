@@ -2,12 +2,13 @@ import random
 from pygame.image import load
 from pygame.math import Vector2
 from pygame.mixer import Sound
+import os
 
 
 def load_sprite(name, with_alpha=True):
-    path = f"C:/Users/maria/PycharmProjects/so2_spaceship_simulator/assets/sprites/{name}"
+    parent_directory = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+    path = parent_directory.__add__("\\assets\\sprites\\").__add__(name)
     loaded_sprite = load(path)
-
     if with_alpha:
         return loaded_sprite.convert_alpha()
     else:
@@ -15,7 +16,8 @@ def load_sprite(name, with_alpha=True):
 
 
 def load_sound(name):
-    path = f"C:/Users/maria/PycharmProjects/so2_spaceship_simulator/assets/sounds/{name}"
+    parent_directory = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+    path = parent_directory.__add__("\\assets\\sounds\\").__add__(name)
     return Sound(path)
 
 
