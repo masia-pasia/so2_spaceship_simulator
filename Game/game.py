@@ -253,6 +253,6 @@ class SpaceShipGame:
 
     def _beer_counter(self):
         # font = pygame_menu.font.FONT_MUNRO
-        text = pygame.font.SysFont("comicsansms", 25).render("Beers left: " + str(self.beer_left), True,
+        text = pygame.font.SysFont("comicsansms", 25).render("Cans of beer left: " + str(self.beer_left), True,
                                                              (255, 255, 255))
         self.screen.blit(text, (10, 600))
