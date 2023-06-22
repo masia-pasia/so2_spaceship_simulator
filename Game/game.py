@@ -36,7 +36,7 @@ def _menu():
     is_working = True
 
     def change_menu():
-        space_ship_game.proba()
+        space_ship_game.main_loop()
         menu.disable()
 
     menu.add.button('Play', change_menu, font_size=40, padding=20)
@@ -69,7 +69,7 @@ class SpaceShipGame:
         self.thread2 = threading.Thread(target=self.spaceship.add_fuel, args=(self.spaceship, self.condition,
                                                                               self.key_lock),
                                         daemon=True)
-        self.thread5 = threading.Thread(target=self.proba)
+        self.thread5 = threading.Thread(target=self.main_loop)
 
         for _ in range(6):
             while True:
@@ -78,24 +78,20 @@ class SpaceShipGame:
                     break
             self.asteroids.append(Asteroid(position))
 
-    def main_loop(self):
+    def start_threads(self):
         self.thread1.start()
         self.thread2.start()
-        # self.thread3.start()
-        # self.thread4.start()
 
-    def proba(self):
-        self.main_loop()
+    def main_loop(self):
+        self.start_threads()
         while True:
             if self.spaceship:
                 self.handle_input()
                 self._process_game_logic()
                 self._draw()
-
             else:
                 self._loss_message()
                 break
-
             if self.beer_left == 0:
                 self._win_message()
                 break
@@ -136,44 +132,40 @@ class SpaceShipGame:
             if current_time - self.fuel_time > FUEL_RESPING_TIME:
                 position = get_random_position(self.screen)
                 if position.distance_to(self.spaceship.position) > self.MIN_DISTANCE:
-                    #self.key_lock.acquire()
                     self.fuel_time = time.time()
                     self.fuel.append(Fuel(position))
-                    #self.key_lock.release()
 
             if current_time - self.beer_time > BEER_RESPING_TIME:
                 position = get_random_position(self.screen)
                 if position.distance_to(self.spaceship.position) > self.MIN_DISTANCE:
-                    #self.key_lock.acquire()
                     self.beer_time = time.time()
                     self.beer.append(Beer(position))
-                    #self.key_lock.release()
             for asteroid in self.asteroids[:]:
                 if asteroid.collides_with(self.spaceship):
                     # fajnie by bylo dodac jakis wybuch po zderzeniu
                     self.spaceship = None
                     break
-                self.key_lock.acquire()
-                for fuel in self.fuel[:]:
+
+            for fuel in self.fuel[:]:
+                for asteroid in self.asteroids[:]:
                     if asteroid.collides_with(fuel):
                         self.fuel.remove(fuel)
                         self.asteroids.remove(asteroid)
+                if self.spaceship:
                     if self.spaceship.collides_with(fuel):
-                        # self.spaceship.key_lock.acquire()
                         with self.condition:
                             self.condition.notify()
                             self.fuel.remove(fuel)
-                        # self.spaceship.key_lock.release()
-                for beer in self.beer[:]:
+            for beer in self.beer[:]:
+                for asteroid in self.asteroids[:]:
                     if asteroid.collides_with(beer):
                         self.beer.remove(beer)
                         self.asteroids.remove(asteroid)
+                if self.spaceship:
                     if self.spaceship.collides_with(beer):
                         self.beer.remove(beer)
                         self.beer_left -= 1
                         print(self.beer_left)
-
-                self.key_lock.release()
 
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
@@ -183,30 +175,6 @@ class SpaceShipGame:
                     break
             if not self.screen.get_rect().collidepoint(bullet.position):
                 self.bullets.remove(bullet)
-
-        # for bullet in self.bullets[:]:
-        #     if not self.screen.get_rect().collidepoint(bullet.position):
-        #         self.bullets.remove(bullet)
-
-    # def _place_beer(self):
-    #     while self.spaceship:
-    #         current_time = time.time()
-    #         if current_time - self.time > FUEL_RESPING_TIME:
-    #             position = get_random_position(self.screen)
-    #             if position.distance_to(self.spaceship.position) > self.MIN_DISTANCE:
-    #                 self.key_lock.acquire()
-    #                 self.time = time.time()
-    #                 self.fuel.append(Fuel(position))
-    #                 self.key_lock.release()
-
-    # def _destroy_beer(self):
-    #     self.key_lock.acquire()
-    #     for asteroid in self.asteroids[:]:
-    #         for fuel in self.fuel[:]:
-    #             if asteroid.collides_with(fuel):
-    #                 self.fuel.remove(fuel)
-    #                 self.asteroids.remove(asteroid)
-    #     self.key_lock.release()
 
     def _draw(self):
         # draw one image onto another
@@ -222,7 +190,6 @@ class SpaceShipGame:
 
         for beer in self.beer:
             beer.draw(self.screen)
-        # self.key_lock.release()
         # updating display
         pygame.display.flip()
         self.clock.tick(60)
@@ -240,33 +207,24 @@ class SpaceShipGame:
             asteroid.velocity = Vector2(0)
         # self.screen.blit("You lost")
         myfont = pygame.font.SysFont("munro", 80)
-        #myfont = pygame_menu.font.FONT_MUNRO
+        # myfont = pygame_menu.font.FONT_MUNRO
 
         # render text
         label = myfont.render("You lost!", 1, (255, 255, 0))
-        label_width = label.get_width()
-        label_height = label.get_height()
-
-        screen_width = self.screen.get_width()
-        screen_height = self.screen.get_height()
-
-        x = (screen_width - label_width) // 2
-        y = (screen_height - label_height) // 2
-
-        self.screen.blit(label, (x, y))
-        pygame.display.update()
-        time.sleep(5)
-        quit()
+        self.update_label(label)
 
     def _win_message(self):
         for asteroid in self.asteroids:
             asteroid.velocity = Vector2(0)
         # self.screen.blit("You lost")
         myfont = pygame.font.SysFont("munro", 80)
-        #myfont = pygame_menu.font.FONT_MUNRO
+        # myfont = pygame_menu.font.FONT_MUNRO
 
         # render text
         label = myfont.render("You won!", 1, (255, 255, 0))
+        self.update_label(label)
+
+    def update_label(self, label):
         label_width = label.get_width()
         label_height = label.get_height()
 
@@ -287,6 +245,7 @@ class SpaceShipGame:
             pygame.draw.rect(self.screen, (255, 255, 255), (10, 10, self.fuel_bar_length, 25), 4)
 
     def _beer_counter(self):
-        #font = pygame_menu.font.FONT_MUNRO
-        text = pygame.font.SysFont("comicsansms", 25).render("Beers left: " + str(self.beer_left), True, (255,255,255))
+        # font = pygame_menu.font.FONT_MUNRO
+        text = pygame.font.SysFont("comicsansms", 25).render("Beers left: " + str(self.beer_left), True,
+                                                             (255, 255, 255))
         self.screen.blit(text, (10, 600))
