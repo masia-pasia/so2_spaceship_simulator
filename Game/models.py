@@ -96,7 +96,6 @@ class Spaceship(GameObject):
             else:
                 self.fuel = 0
             spaceship.key_lock.release()
-            print(self.fuel)
             # game.SpaceShipGame._fuel_bar(game.SpaceShipGame)
             time.sleep(1)
 
