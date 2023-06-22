@@ -69,8 +69,6 @@ class SpaceShipGame:
         self.thread2 = threading.Thread(target=self.spaceship.add_fuel, args=(self.spaceship, self.condition,
                                                                               self.key_lock),
                                         daemon=True)
-        # self.thread3 = threading.Thread(target=self._place_beer, daemon=True)
-        # self.thread4 = threading.Thread(target=self._destroy_beer, daemon=True)
         self.thread5 = threading.Thread(target=self.proba)
 
         for _ in range(6):
