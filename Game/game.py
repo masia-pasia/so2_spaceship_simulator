@@ -10,6 +10,7 @@ import pygame_menu
 
 FUEL_RESPING_TIME = 5
 BEER_RESPING_TIME = 8
+ASTEROID_RESPING_TIME = 5
 
 
 def _init_pygame():
@@ -63,6 +64,7 @@ class SpaceShipGame:
         self.fuel_ratio = self.max_fuel / self.fuel_bar_length
         self.fuel_time = time.time()
         self.beer_time = time.time()
+        self.asteroid_time = time.time()
         self.key_lock = threading.Lock()
         self.condition = threading.Condition()
         self.thread1 = threading.Thread(target=self.spaceship.use_fuel, args=(self.spaceship,), daemon=True)
@@ -140,6 +142,11 @@ class SpaceShipGame:
                 if position.distance_to(self.spaceship.position) > self.MIN_DISTANCE:
                     self.beer_time = time.time()
                     self.beer.append(Beer(position))
+            if current_time - self.asteroid_time > ASTEROID_RESPING_TIME:
+                position = get_random_position(self.screen)
+                if position.distance_to(self.spaceship.position) > self.MIN_DISTANCE:
+                    self.asteroid_time = time.time()
+                    self.asteroids.append(Asteroid(position))
             for asteroid in self.asteroids[:]:
                 if asteroid.collides_with(self.spaceship):
                     # fajnie by bylo dodac jakis wybuch po zderzeniu
@@ -165,7 +172,6 @@ class SpaceShipGame:
                     if self.spaceship.collides_with(beer):
                         self.beer.remove(beer)
                         self.beer_left -= 1
-                        print(self.beer_left)
 
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
