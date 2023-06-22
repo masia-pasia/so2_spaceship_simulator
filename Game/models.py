@@ -97,7 +97,7 @@ class Spaceship(GameObject):
                 self.fuel = 0
             spaceship.key_lock.release()
             print(self.fuel)
-            #game.SpaceShipGame._fuel_bar(game.SpaceShipGame)
+            # game.SpaceShipGame._fuel_bar(game.SpaceShipGame)
             time.sleep(1)
 
     def add_fuel(self, spaceship, condition, key_lock):
@@ -105,28 +105,11 @@ class Spaceship(GameObject):
             with condition:
                 condition.wait()
                 spaceship.key_lock.acquire()
-                print('dupa')
-
                 if self.fuel + 0.2 * self.FUEL_CAPACITY > self.FUEL_CAPACITY:
                     self.fuel = self.FUEL_CAPACITY
                 else:
                     self.fuel += 0.2 * self.FUEL_CAPACITY
                 spaceship.key_lock.release()
-
-
-
-# while spaceship:
-#     beer_key_lock.acquire()
-#     for fuel in beer_table[:]:
-#         if spaceship.collides_with(fuel):
-#             self.key_lock.acquire()
-#             if self.fuel + 0.2 * self.FUEL_CAPACITY > self.FUEL_CAPACITY:
-#                 self.fuel = self.FUEL_CAPACITY
-#             else:
-#                 self.fuel += 0.2 * self.FUEL_CAPACITY
-#             self.key_lock.release()
-#             beer_table.remove(fuel)
-#     beer_key_lock.release()
 
 
 class Asteroid(GameObject):
