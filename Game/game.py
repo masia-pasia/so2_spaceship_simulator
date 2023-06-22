@@ -2,7 +2,6 @@ import pygame
 import threading
 
 from pygame import Vector2
-from pygame_menu import Theme
 import time
 from utils import load_sprite, get_random_position
 from models import Spaceship, Asteroid, Fuel, Beer
