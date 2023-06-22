@@ -11,6 +11,7 @@ import pygame_menu
 FUEL_RESPING_TIME = 5
 BEER_RESPING_TIME = 8
 ASTEROID_RESPING_TIME = 5
+HOW_MANY_CANS_OF_BEER_TO_COLLECT = 10
 
 
 def _init_pygame():
@@ -57,7 +58,7 @@ class SpaceShipGame:
         self.asteroids = []
         self.fuel = []
         self.beer = []
-        self.beer_left = 3
+        self.beer_left = HOW_MANY_CANS_OF_BEER_TO_COLLECT
         self.rect = self.screen.get_rect(center=(400, 400))
         self.max_fuel = 10
         self.fuel_bar_length = 400
