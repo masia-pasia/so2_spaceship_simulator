@@ -223,23 +223,37 @@ class SpaceShipGame:
     def _loss_message(self):
         for asteroid in self.asteroids:
             asteroid.velocity = Vector2(0)
-        # self.screen.blit("You lost")
-        myfont = pygame.font.SysFont("munro", 80)
-        # myfont = pygame_menu.font.FONT_MUNRO
+
+        pygame.font.init()
+        font_path = "../assets/fonts/munro.ttf"
+        font_size = 80
+        font = pygame.font.Font(font_path, font_size)
 
         # render text
-        label = myfont.render("You have lost!", 1, (255, 255, 0))
+        label = font.render("You have lost!", 1, (255, 255, 255))
+        text_x = (self.screen.get_width() - label.get_width()) // 2
+        text_y = (self.screen.get_height() - label.get_height()) // 2
+
+        # blit the text onto the screen
+        self.screen.blit(label, (text_x, text_y))
         self.update_label(label)
 
     def _win_message(self):
         for asteroid in self.asteroids:
             asteroid.velocity = Vector2(0)
-        # self.screen.blit("You lost")
-        myfont = pygame.font.SysFont("munro", 80)
-        # myfont = pygame_menu.font.FONT_MUNRO
+
+        pygame.font.init()
+        font_path = "../assets/fonts/munro.ttf"
+        font_size = 80
+        font = pygame.font.Font(font_path, font_size)
 
         # render text
-        label = myfont.render("You have won!", 1, (255, 255, 0))
+        label = font.render("You have won!", 1, (255, 255, 255))
+        text_x = (self.screen.get_width() - label.get_width()) // 2
+        text_y = (self.screen.get_height() - label.get_height()) // 2
+
+        # blit the text onto the screen
+        self.screen.blit(label, (text_x, text_y))
         self.update_label(label)
 
     def update_label(self, label):
@@ -265,7 +279,10 @@ class SpaceShipGame:
 
     # shows how many cans of beer has left
     def _beer_counter(self):
-        # font = pygame_menu.font.FONT_MUNRO
-        text = pygame.font.SysFont("comicsansms", 25).render("Cans of beer left: " + str(self.beer_left), True,
-                                                             (255, 255, 255))
-        self.screen.blit(text, (10, 600))
+        if self.spaceship:
+            pygame.font.init()
+            font_path = "../assets/fonts/munro.ttf"
+            font_size = 35
+            font = pygame.font.Font(font_path, font_size)
+            label = font.render("Cans of beer left: " + str(self.beer_left), True,(255, 255, 255))
+            self.screen.blit(label, (30, 610))
