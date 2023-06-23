@@ -46,6 +46,7 @@ def _menu():
 
 
 class SpaceShipGame:
+    # min distance between objects wneh placing them
     MIN_DISTANCE = 250
 
     def __init__(self, surface):
@@ -62,6 +63,7 @@ class SpaceShipGame:
         self.max_fuel = 10
         self.fuel_bar_length = 400
         self.fuel_ratio = self.max_fuel / self.fuel_bar_length
+        # time for generating new fuel, beer and asteroid
         self.fuel_time = time.time()
         self.beer_time = time.time()
         self.asteroid_time = time.time()
@@ -72,7 +74,7 @@ class SpaceShipGame:
                                                                               self.key_lock),
                                         daemon=True)
         self.thread5 = threading.Thread(target=self.main_loop)
-
+        # generating initial asteroids
         for _ in range(6):
             while True:
                 position = get_random_position(self.screen)
@@ -80,10 +82,12 @@ class SpaceShipGame:
                     break
             self.asteroids.append(Asteroid(position))
 
+    # method responsible for running threads
     def start_threads(self):
         self.thread1.start()
         self.thread2.start()
 
+    # method for running crucial parts of game
     def main_loop(self):
         self.start_threads()
         while True:
@@ -126,11 +130,13 @@ class SpaceShipGame:
                 self.spaceship.stop()
 
     def _process_game_logic(self):
+        # move every object to their new positions
         for game_object in self._get_game_objects():
             game_object.move(self.screen)
-
+        # if the spaceship exists
         if self.spaceship:
             current_time = time.time()
+            # checking if the condition about placing objects is true
             if current_time - self.fuel_time > FUEL_RESPING_TIME:
                 position = get_random_position(self.screen)
                 if position.distance_to(self.spaceship.position) > self.MIN_DISTANCE:
@@ -147,38 +153,44 @@ class SpaceShipGame:
                 if position.distance_to(self.spaceship.position) > self.MIN_DISTANCE:
                     self.asteroid_time = time.time()
                     self.asteroids.append(Asteroid(position))
+            # checking if asteroid has collided with spaceship
             for asteroid in self.asteroids[:]:
                 if asteroid.collides_with(self.spaceship):
                     # fajnie by bylo dodac jakis wybuch po zderzeniu
                     self.spaceship = None
                     break
-
+            # checking if fuel has collided with asteroid, if it has both are destroyed
             for fuel in self.fuel[:]:
                 for asteroid in self.asteroids[:]:
                     if asteroid.collides_with(fuel):
                         self.fuel.remove(fuel)
                         self.asteroids.remove(asteroid)
+                # checking if spaceship has "collided" with fuel, if it has fuel is tanked
                 if self.spaceship:
                     if self.spaceship.collides_with(fuel):
                         with self.condition:
+                            # notifying waiting thread
                             self.condition.notify()
                             self.fuel.remove(fuel)
+            # checking if beer has collided with asteroid, if it has both are destroyed
             for beer in self.beer[:]:
                 for asteroid in self.asteroids[:]:
                     if asteroid.collides_with(beer):
                         self.beer.remove(beer)
                         self.asteroids.remove(asteroid)
+                # checking if beer has collided with spaceship, if it has there is one less beer to collect
                 if self.spaceship:
                     if self.spaceship.collides_with(beer):
                         self.beer.remove(beer)
                         self.beer_left -= 1
-
+        # checking if bullet has collided with asteroid, if it has both are destroyed
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
                 if asteroid.collides_with(bullet):
                     self.asteroids.remove(asteroid)
                     self.bullets.remove(bullet)
                     break
+            # removing non-visible bullets to improve performance
             if not self.screen.get_rect().collidepoint(bullet.position):
                 self.bullets.remove(bullet)
 
@@ -187,7 +199,7 @@ class SpaceShipGame:
         self.screen.blit(self.background, (0, 0))
         self._fuel_bar()
         self._beer_counter()
-        # self.key_lock.acquire()
+        # redrawing the scene
         for game_object in self._get_game_objects():
             game_object.draw(self.screen)
 
@@ -216,7 +228,7 @@ class SpaceShipGame:
         # myfont = pygame_menu.font.FONT_MUNRO
 
         # render text
-        label = myfont.render("You lost!", 1, (255, 255, 0))
+        label = myfont.render("You have lost!", 1, (255, 255, 0))
         self.update_label(label)
 
     def _win_message(self):
@@ -227,7 +239,7 @@ class SpaceShipGame:
         # myfont = pygame_menu.font.FONT_MUNRO
 
         # render text
-        label = myfont.render("You won!", 1, (255, 255, 0))
+        label = myfont.render("You have won!", 1, (255, 255, 0))
         self.update_label(label)
 
     def update_label(self, label):
@@ -245,11 +257,13 @@ class SpaceShipGame:
         time.sleep(5)
         quit()
 
+    # updating fuel
     def _fuel_bar(self):
         if self.spaceship:
             pygame.draw.rect(self.screen, (255, 0, 0), (10, 10, self.spaceship.fuel / self.fuel_ratio, 25))
             pygame.draw.rect(self.screen, (255, 255, 255), (10, 10, self.fuel_bar_length, 25), 4)
 
+    # shows how many cans of beer has left
     def _beer_counter(self):
         # font = pygame_menu.font.FONT_MUNRO
         text = pygame.font.SysFont("comicsansms", 25).render("Cans of beer left: " + str(self.beer_left), True,

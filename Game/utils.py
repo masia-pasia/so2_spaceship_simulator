@@ -5,6 +5,7 @@ from pygame.mixer import Sound
 import os
 
 
+# loading images like ufo, fuel or beer
 def load_sprite(name, with_alpha=True):
     parent_directory = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     path = parent_directory.__add__("\\assets\\sprites\\").__add__(name)
@@ -15,11 +16,14 @@ def load_sprite(name, with_alpha=True):
         return loaded_sprite.convert()
 
 
+# loading sound (laser sound for example)
 def load_sound(name):
     parent_directory = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     path = parent_directory.__add__("\\assets\\sounds\\").__add__(name)
     return Sound(path)
 
+
+# generating random position for placing objects
 
 def get_random_position(surface):
     return Vector2(
@@ -27,6 +31,8 @@ def get_random_position(surface):
         random.randrange(surface.get_height())
     )
 
+
+# generating random velocity for objects
 
 def get_random_velocity(min_speed, max_speed):
     speed = random.randint(min_speed, max_speed)
